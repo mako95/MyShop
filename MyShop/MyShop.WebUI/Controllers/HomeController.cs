@@ -1,4 +1,5 @@
-﻿using MyShop.Core.Contracts;
+﻿using Microsoft.Ajax.Utilities;
+using MyShop.Core.Contracts;
 using MyShop.Core.Models;
 using MyShop.Core.ViewModels;
 using System;
@@ -20,7 +21,7 @@ namespace MyShop.WebUI.Controllers
             productCategories= productCategoryContext;
         }
 
-        public ActionResult Index(string category = null)
+        public ActionResult Index(string category = null, string nameFilter = null)
         {
             List<Product> products;
             List<ProductCategory> categories = productCategories.Collection().ToList();
@@ -33,6 +34,11 @@ namespace MyShop.WebUI.Controllers
             {
                 products = context.Collection().Where(p => p.Category == category).ToList();
             }
+            if (!String.IsNullOrEmpty(nameFilter))
+            {
+                products = products.Where(p => p.Name.ToUpper().Contains(nameFilter.ToUpper()) || p.Description.ToUpper().Contains(nameFilter.ToUpper())).ToList();
+            }
+
             ProductListViewModel model = new ProductListViewModel();
             model.Products = products;
             model.ProductCategories = categories;
