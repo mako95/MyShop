@@ -53,7 +53,14 @@ namespace MyShop.WebUI.Controllers
         {
             ProductCategory productCategory = context.Find(id);
 
-            return View(productCategory);
+            if (productCategory == null)
+            {
+                return HttpNotFound();
+            }
+            else
+            {
+                return View(productCategory);
+            }
         }
 
         [HttpPost]

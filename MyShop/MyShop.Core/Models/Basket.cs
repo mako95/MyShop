@@ -12,7 +12,7 @@ namespace MyShop.Core.Models
 
         public Basket()
         {
-            this. BasketItems = new List<BasketItem>();
+            this.BasketItems = new List<BasketItem>();
         }
     }
 }

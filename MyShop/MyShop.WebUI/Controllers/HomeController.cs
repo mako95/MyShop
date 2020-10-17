@@ -34,7 +34,8 @@ namespace MyShop.WebUI.Controllers
             {
                 products = context.Collection().Where(p => p.Category == category).ToList();
             }
-            if (!String.IsNullOrEmpty(nameFilter))
+
+            if (!string.IsNullOrEmpty(nameFilter))
             {
                 products = products.Where(p => p.Name.ToUpper().Contains(nameFilter.ToUpper()) || p.Description.ToUpper().Contains(nameFilter.ToUpper())).ToList();
             }
