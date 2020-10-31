@@ -32,7 +32,6 @@ namespace MyShop.WebUI.Tests.Controllers
             ///Act
             var result = controller.Index() as ViewResult;
             var viewModel = (ProductListViewModel)result.ViewData.Model;
-
             
 
             ///Assert
