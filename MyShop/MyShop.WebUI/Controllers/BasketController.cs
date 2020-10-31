@@ -13,11 +13,13 @@ namespace MyShop.WebUI.Controllers
     {
         IBasketService basketService;
         IOrderService orderService;
+        IRepository<Customer> customerContext;
 
-        public BasketController(IBasketService basketService, IOrderService orderService)
+        public BasketController(IBasketService basketService, IOrderService orderService, IRepository<Customer> customerContext)
         {
             this.basketService = basketService;
             this.orderService = orderService;
+            this.customerContext = customerContext;
         }
 
         // GET: Basket
@@ -49,16 +51,39 @@ namespace MyShop.WebUI.Controllers
             return PartialView(basketSummary);
         }
 
+        [Authorize]
         public ActionResult Checkout()
         {
-            return View();
+            Customer customer = customerContext.Collection().FirstOrDefault(c => c.Email == User.Identity.Name);
+
+            if (customer != null)
+            {
+                Order order = new Order()
+                {
+                    FirstName = customer.FirstName,
+                    LastName = customer.LastName,
+                    Email = customer.Email,
+                    Street = customer.Street,
+                    City = customer.City,
+                    State = customer.State,
+                    ZipCode = customer.ZipCode
+                };
+
+                return View(order);
+            }
+            else
+            {
+                return RedirectToAction("Error");
+            }
         }
 
         [HttpPost]
+        [Authorize]
         public ActionResult Checkout(Order order)
         {
             var basketItems = basketService.GetBasketItems(this.HttpContext);
             order.OrderStatus = "Order Created";
+            order.Email = User.Identity.Name;
 
             //Process Payment Here
 

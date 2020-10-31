@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Principal;
 using System.Web.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MyShop.Core.Contracts;
@@ -21,11 +22,12 @@ namespace MyShop.WebUI.Tests.Controllers
             IRepository<Basket> basketContext = new MockContext<Basket>();
             IRepository<Product> productContext = new MockContext<Product>();
             IRepository<Order> orderContext = new MockContext<Order>();
+            IRepository<Customer> customerContext = new MockContext<Customer>();
             MockHttpContext httpContext = new MockHttpContext();
             
             IBasketService basketService = new BasketService(productContext, basketContext);
             IOrderService orderService = new OrderService(orderContext);
-            BasketController controller = new BasketController(basketService, orderService);
+            BasketController controller = new BasketController(basketService, orderService, customerContext);
             controller.ControllerContext = new System.Web.Mvc.ControllerContext(httpContext, new System.Web.Routing.RouteData(), controller);
 
             ///Act
@@ -46,12 +48,13 @@ namespace MyShop.WebUI.Tests.Controllers
             IRepository<Basket> basketContext = new MockContext<Basket>();
             IRepository<Product> productContext = new MockContext<Product>();
             IRepository<Order> orderContext = new MockContext<Order>();
+            IRepository<Customer> customerContext = new MockContext<Customer>();
             MockHttpContext httpContext = new MockHttpContext();
             Basket basket = new Basket();
 
             IBasketService basketService = new BasketService(productContext, basketContext);
             IOrderService orderService = new OrderService(orderContext);
-            BasketController controller = new BasketController(basketService, orderService);
+            BasketController controller = new BasketController(basketService, orderService, customerContext);
             controller.ControllerContext = new System.Web.Mvc.ControllerContext(httpContext, new System.Web.Routing.RouteData(), controller);
             httpContext.Request.Cookies.Add(new System.Web.HttpCookie("eCommerceBasket") { Value = basket.Id });
 
@@ -88,11 +91,17 @@ namespace MyShop.WebUI.Tests.Controllers
             
             IRepository<Order> orderContext = new MockContext<Order>();
 
+            IRepository<Customer> customerContext = new MockContext<Customer>();
+
             IBasketService basketService = new BasketService(productContext, basketContext);
             IOrderService orderService = new OrderService(orderContext);
 
-            BasketController basketController = new BasketController(basketService, orderService);
+            customerContext.Insert(new Customer() { Id = "1", Email = "mako.2@hotmail.com", ZipCode = "12345" });
+            IPrincipal FakeUser = new GenericPrincipal(new GenericIdentity("mako.2@hotmail.com", "Forms"), null);
+
+            BasketController basketController = new BasketController(basketService, orderService, customerContext);
             var httpContext = new MockHttpContext();
+            httpContext.User = FakeUser;
             httpContext.Request.Cookies.Add(new System.Web.HttpCookie("eCommerceBasket") { Value = basket.Id });
             basketController.ControllerContext = new ControllerContext(httpContext, new System.Web.Routing.RouteData(), basketController);
 
